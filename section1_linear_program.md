@@ -46,20 +46,19 @@ We are also required to create a decision variable for the number of checks that
 
 **Minimize** the banks total labor costs. 
 
-$$\text{Minimize } Z = 160(F_1 + F_2 + F_3) + 75(P_1 + P_2)$$
+We want to minize the bank’s total daily labor cost, equal to $160 times the number of full-time workers across the three full-time shifts plus $75 times the number of part-time workers across the two part-time shifts.
 
-Where:
-- $160 represents the daily wage for each full-time worker
-- $75 represents the daily wage for each part-time worker
+$\min \quad 160 \sum_{i=1}^{3} F_i + 75 \sum_{j=1}^{2} P_j$
+
 
 ## Constraints
 
 ### 1. Worker Capacity Constraints
-The number of checks processed each hour cannot exceed the processing capacity of available workers:
+The number of check we process each hour ($Z_t$) are limited and cannot exceed the  processing capacity of available workers in each hour.  
 
 $$Z_t \leq 500 \times w_t \quad \text{, ∀ } t = 1, 2, \ldots, 10$$
 
-Where $w_t$ represents the number of workers available during hour $t$:
+For convenience, we have created a parameter $w_t$ that represents the number of workers available during hour $t$:
 - $w_1 = F_1$ (10am-11am)
 - $w_2 = F_1 + F_2$ (11am-12pm)
 - $w_3 = F_1 + F_2 + F_3$ (12pm-1pm)
@@ -71,22 +70,32 @@ Where $w_t$ represents the number of workers available during hour $t$:
 - $w_9 = F_2 + F_3 + P_1 + P_2$ (6pm-7pm)
 - $w_{10} = F_3 + P_2$ (7pm-8pm)
 
+
+
 ### 2. Machine Capacity Constraints
-The bank has 11 check-processing machines, limiting total hourly processing:
+The number of checks we process each hour ($Z_t$) are also limited by the 11 processing machines the bank has and the amount of checks that each machine can process. 
+The bank has 11 check-processing machines, where each machine processes up to 500 checks. Therefore ($Z_t$) cannot exceed 11 x 500.
 
 $$Z_t \leq 500 \times 11 \quad \text{, ∀ } t = 1, 2, \ldots, 10$$
 
 ### 3. Check Flow Balance Constraints
-The number of remaining checks follows the flow balance equation:
+In order to calculate the number of checks we have remaining at the end of each hour $C_t$, we must use the equation below.
 
-$$C_1 = \text{checks\_arrivals}[0] - Z_1$$
+$$
+C_1 = \text{checks\_arrivals}[0] - Z_1
+$$
+
+where $C_1$ is the number of checks remaining at the end of hour 1, 
+$\text{checks\_arrivals}[0]$ is the number of checks arriving at the start of hour 1, 
+and $Z_1$ is the number of checks processed in hour 1.
+
 
 $$C_t = \text{checks\_arrivals}[t-1] + C_{t-1} - Z_t \quad \text{, ∀ } t = 2, 3, \ldots, 10$$
 
 Where $\text{checks\_arrivals}[t-1]$ represents the number of new checks arriving at the start of hour $t$.
 
 ### 4. End-of-Day Processing Constraint
-All checks must be processed by the end of the business day:
+All checks must be processed by the end of the business day (hour 10):
 
 $$C_{10} \leq 0$$
 
@@ -102,15 +111,3 @@ $$F_i \geq 0 \quad \text{, ∀ } i = 1, 2, 3$$
 $$P_j \geq 0 \quad \text{, ∀ } j = 1, 2$$
 $$Z_t \geq 0 \quad \text{, ∀ } t = 1, 2, \ldots, 10$$
 $$C_t \geq 0 \quad \text{, ∀ } t = 1, 2, \ldots, 10$$
-
-## Model Scalability
-
-This linear programming formulation is designed to be robust and scalable:
-
-- **Data Updates:** The model can handle changes in check arrival patterns by updating the `checks_arrivals` array
-- **Capacity Changes:** Machine limitations can be modified by changing the coefficient 11 in the machine capacity constraints
-- **Wage Changes:** Worker costs can be adjusted by modifying the coefficients 160 and 75 in the objective function
-- **Shift Changes:** Worker availability patterns can be modified by adjusting the $w_t$ definitions
-- **Processing Efficiency:** The 500 checks/hour rate can be updated throughout all relevant constraints
-
-This comprehensive model ensures that Bank One can minimize labor costs while meeting all operational requirements and processing all checks by the end of each business day.
