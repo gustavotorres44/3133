@@ -58,7 +58,7 @@ The number of check we process each hour ($Z_t$) are limited and cannot exceed t
 
 $$Z_t \leq 500 \times w_t \quad \text{, ∀ } t = 1, 2, \ldots, 10$$
 
-For convenience, we have created a parameter $w_t$ that represents the number of workers available during hour $t$:
+For convenience, we have created a parameter $w_t$ that represents the different shifts of workers available during hour $t$:
 - $w_1 = F_1$ (10am-11am)
 - $w_2 = F_1 + F_2$ (11am-12pm)
 - $w_3 = F_1 + F_2 + F_3$ (12pm-1pm)
